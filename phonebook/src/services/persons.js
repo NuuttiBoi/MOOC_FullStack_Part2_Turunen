@@ -6,7 +6,7 @@ const getAll = () => {
     return request.then(response =>  response.data)
 }
 const getPerson = (personID) => {
-    const request = axios.get(baseURL, personID)
+    const request = axios.get(`${baseURL}/${personID}`)
     return request.then(response => response.data)
 }
 const create = newPerson => {
@@ -18,4 +18,8 @@ const remove = (personID) => {
     console.log(`${baseURL}/${personID}`)
     return request.then(response => response.data)
 }
-export default { create, getAll, getPerson, remove }
+const update = (personID, newPerson) =>{
+    const request = axios.put(`${baseURL}/${personID}`,newPerson)
+    return request.then(response => response.data)
+}
+export default { create, getAll, getPerson, remove, update }

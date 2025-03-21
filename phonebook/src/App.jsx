@@ -18,7 +18,6 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [filter, setFilter] = useState('')
     const [showAll, setShowAll] = useState(true)
-    const [selectedPerson, setSelectedPerson] = useState('')
     const setName = (event)=>{
         setNewName(event.target.value)
     }
@@ -41,8 +40,23 @@ const App = () => {
             name: newName,
             number: newNumber
         }
-        if(persons.some(person => person.name === newName)){
-            alert(`${newName} is already added to the phonebook!`)
+        if(persons.some(person => person.name.toLowerCase() === newName.toLowerCase())){
+            if(window.confirm(`${newName} is already added to the phonebook, replace old
+            number with new one?`)){
+                console.log('updating number')
+                const personToUpdate = persons.find(person => person.name === newName)
+                const updatedPerson = {
+                    ...personToUpdate, number: newNumber
+                }
+                console.log('person to update', personToUpdate)
+                personsService
+                    .update(personToUpdate.id, updatedPerson)
+                    .then(returnedPerson => {
+                        setPersons(persons.map(person => person.id === personToUpdate.id ?
+                        returnedPerson : person))
+                        console.log('return data', returnedPerson.data)
+                    })
+            }
         } else{
             console.log('adding new person')
             personsService
@@ -56,11 +70,23 @@ const App = () => {
         setNewNumber('')
     }
     const deletePerson = (personID) => {
-        console.log(personID)
         personsService
-            .remove(personID)
-            .then(response => {
-                setPersons(persons.concat(response.data))
+            .getPerson(personID)
+            .then(returnedPerson => {
+                if(window.confirm(`are you sure you want to delete ${returnedPerson.name} from
+            the phonebook?`)){
+                    personsService
+                        .remove(personID)
+                        .then(response => {
+                            console.log(response.data)
+                        })
+                        .then(response => {
+                            setPersons(persons.filter((person) => person.id !== personID))
+                        })
+                        .catch(error => {
+                            alert('an error occured while trying to delete')
+                        })
+                }
             })
     }
 
