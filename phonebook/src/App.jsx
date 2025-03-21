@@ -18,6 +18,7 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [filter, setFilter] = useState('')
     const [showAll, setShowAll] = useState(true)
+    const [selectedPerson, setSelectedPerson] = useState('')
     const setName = (event)=>{
         setNewName(event.target.value)
     }
@@ -54,6 +55,14 @@ const App = () => {
         setNewName('')
         setNewNumber('')
     }
+    const deletePerson = (personID) => {
+        console.log(personID)
+        personsService
+            .remove(personID)
+            .then(response => {
+                setPersons(persons.concat(response.data))
+            })
+    }
 
     return (
         <div>
@@ -72,6 +81,7 @@ const App = () => {
             <h2>Numbers</h2>
             <Persons
                 personsToShow={personsToShow}
+                onDelete={deletePerson}
             />
         </div>
     )
