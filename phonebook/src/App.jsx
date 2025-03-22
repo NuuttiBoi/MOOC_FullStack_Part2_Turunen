@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
+import Notification from "./components/Notification.jsx";
 import personsService from "./services/persons";
 
 const App = () => {
@@ -18,6 +19,8 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [filter, setFilter] = useState('')
     const [showAll, setShowAll] = useState(true)
+    const [notificationMessage, setNotificationMessage] = useState(null)
+    const [notificationType, setNotificationType] = useState(null)
     const setName = (event)=>{
         setNewName(event.target.value)
     }
@@ -34,6 +37,7 @@ const App = () => {
     const personsToShow = showAll ? persons
         : persons.filter(person =>
             person.name.toLowerCase().includes(filter.toLowerCase()))
+
     const addPerson = (event) => {
         event.preventDefault()
         const personObject = {
@@ -54,7 +58,25 @@ const App = () => {
                     .then(returnedPerson => {
                         setPersons(persons.map(person => person.id === personToUpdate.id ?
                         returnedPerson : person))
+                        setNotificationType('add')
+                        setNotificationMessage(`${personToUpdate.name}'s number has been updated.`)
+                        setTimeout(() => {
+                            setNotificationMessage(null)
+                            setNotificationType(null)
+                        },5000)
                         console.log('return data', returnedPerson.data)
+                    })
+                    // catch error if a person has already been deleted from the server
+                    // before trying to update their number.
+                    .catch(error => {
+                        console.log(`${personToUpdate.name} has been deleted from the server...`)
+                        setNotificationType('remove')
+                        setNotificationMessage(`Information of${personToUpdate.name} 
+                        has already been deleted from the server.`)
+                        setTimeout(() => {
+                            setNotificationType(null)
+                            setNotificationMessage(null)
+                        }, 5000)
                     })
             }
         } else{
@@ -63,8 +85,14 @@ const App = () => {
                 .create(personObject)
                 .then(returnedPerson => {
                 setPersons(persons.concat(returnedPerson))
-            })
-            setPersons(persons.concat(personObject))
+                    setNotificationType('add')
+                    setNotificationMessage(`${personObject.name} has been added to the list.`)
+                    setTimeout(() => {
+                        setNotificationMessage(null)
+                        setNotificationType(null)
+                    }, 5000)
+
+                })
         }
         setNewName('')
         setNewNumber('')
@@ -82,6 +110,13 @@ const App = () => {
                         })
                         .then(response => {
                             setPersons(persons.filter((person) => person.id !== personID))
+                            setNotificationType('remove')
+                            setNotificationMessage(`${returnedPerson.name} has been removed
+                            from the list.`)
+                            setTimeout(() => {
+                                setNotificationMessage(null)
+                                setNotificationType(null)
+                            },5000)
                         })
                         .catch(error => {
                             alert('an error occured while trying to delete')
@@ -93,6 +128,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={notificationMessage} type={notificationType}/>
             <Filter
                 filter={filter}
                 onChange={changeFilter}
