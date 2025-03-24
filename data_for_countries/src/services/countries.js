@@ -15,7 +15,7 @@ const getCountry = (props) => {
 const getWeather = (lat, lon) => {
     console.log(api_key)
     const request = axios.
-    get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`);
+    get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric `);
     return request.then(response => response.data);
 }
 
