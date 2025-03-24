@@ -38,6 +38,7 @@ const App = () => {
         : persons.filter(person =>
             person.name.toLowerCase().includes(filter.toLowerCase()))
 
+
     const addPerson = (event) => {
         event.preventDefault()
         const personObject = {
