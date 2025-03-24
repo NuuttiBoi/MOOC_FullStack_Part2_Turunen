@@ -1,8 +1,6 @@
 const Header = (props) => <h1>{props.course}</h1>
 
 const Content = (props) => {
-    console.log('homo',props.parts.map(part =>
-        <Part key={part.id} part={props.parts[part]}/>))
     return (
         <div>
             {props.parts.map(part =>
